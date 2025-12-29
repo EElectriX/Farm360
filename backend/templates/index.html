@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Prediction Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+            line-height: 1.5;
+        }
+        h2 {
+            margin-top: 40px;
+            color: #333;
+        }
+        .section {
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        input, button, select {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        img {
+            width: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .result-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🌾 Crop Disease Prediction – Unified Dashboard</h1>
+<p>Select crop → upload image → optionally enter location → get prediction.</p>
+
+<!-- ==========================================================
+        1. POTATO - IMAGE + WEATHER
+=========================================================== -->
+<div class="section">
+    <h2>🥔 Potato Disease Detection</h2>
+
+    <label>Select Potato Image *</label>
+    <input type="file" id="potatoImage" accept="image/*">
+
+    <label>Latitude (optional)</label>
+    <input type="number" id="potatoLat" step="any">
+
+    <label>Longitude (optional)</label>
+    <input type="number" id="potatoLon" step="any">
+
+    <button onclick="predictPotato()">Predict Potato Disease</button>
+
+    <div id="potatoResult" class="result-box" style="display:none;">
+        <h3>Result</h3>
+        <img id="potatoPreview">
+        <p><b>Image Prediction:</b> <span id="potatoImgPred"></span></p>
+        <p><b>Confidence:</b> <span id="potatoImgConf"></span></p>
+        <p><b>Weather Prediction:</b> <span id="potatoWeatherPred"></span></p>
+        <p><b>Final:</b> <span id="potatoFinal"></span></p>
+    </div>
+</div>
+
+
+<!-- ==========================================================
+        RICE - IMAGE + OPTIONAL LAT/LON
+=========================================================== -->
+<div class="section">
+    <h2>🌾 Rice Disease Detection</h2>
+
+    <label>Select Rice Image *</label>
+    <input type="file" id="riceImage" accept="image/*">
+
+    <label>Latitude (optional)</label>
+    <input type="number" id="riceLat" step="any">
+
+    <label>Longitude (optional)</label>
+    <input type="number" id="riceLon" step="any">
+
+    <button onclick="predictRice()">Predict Rice Disease</button>
+
+    <div id="riceResult" class="result-box" style="display:none;">
+        <h3>Result</h3>
+        <img id="ricePreview">
+        <p><b>Image Prediction:</b> <span id="riceImgPred"></span></p>
+        <p><b>Confidence:</b> <span id="riceImgConf"></span></p>
+        <p><b>Weather Prediction:</b> <span id="riceWeatherPred"></span></p>
+        <p><b>Final:</b> <span id="riceFinal"></span></p>
+    </div>
+</div>
+
+<!-- ==========================================================
+        WHEAT - IMAGE + OPTIONAL LAT/LON
+=========================================================== -->
+<div class="section">
+    <h2>🌾 Wheat Disease Detection</h2>
+
+    <label>Select Wheat Image *</label>
+    <input type="file" id="wheatImage" accept="image/*">
+
+    <label>Latitude (optional)</label>
+    <input type="number" id="wheatLat" step="any">
+
+    <label>Longitude (optional)</label>
+    <input type="number" id="wheatLon" step="any">
+
+    <button onclick="predictWheat()">Predict Wheat Disease</button>
+
+    <div id="wheatResult" class="result-box" style="display:none;">
+        <h3>Result</h3>
+        <img id="wheatPreview">
+        <p><b>Image Prediction:</b> <span id="wheatImgPred"></span></p>
+        <p><b>Confidence:</b> <span id="wheatImgConf"></span></p>
+        <p><b>Weather Prediction:</b> <span id="wheatWeatherPred"></span></p>
+        <p><b>Final:</b> <span id="wheatFinal"></span></p>
+    </div>
+</div>
+
+<!-- ==========================================================
+        6. GOAL-2 WEATHER (LAT/LON)
+=========================================================== -->
+<div class="section">
+    <h2>📍 Soil & Weather Stress (Goal-2)</h2>
+
+    <label>Latitude</label>
+    <input id="goal2Lat" value="22.57">
+
+    <label>Longitude</label>
+    <input id="goal2Lon" value="88.36">
+
+    <button onclick="predictGoal2()">Check Weather Stress</button>
+
+    <pre id="goal2Output" class="result-box"></pre>
+</div>
+
+
+
+<!-- ============================
+        SCRIPTS
+============================ -->
+
+<script>
+
+// ----------------- POTATO -----------------
+async function predictPotato() {
+    const file = document.getElementById("potatoImage").files[0];
+    const lat = document.getElementById("potatoLat").value;
+    const lon = document.getElementById("potatoLon").value;
+
+    let fd = new FormData();
+    fd.append("file", file);
+    fd.append("lat", lat);
+    fd.append("lon", lon);
+
+    const res = await fetch("http://127.0.0.1:5000/predict/goal3/potato", { method: "POST", body: fd });
+    const data = await res.json();
+
+    document.getElementById("potatoResult").style.display = "block";
+    document.getElementById("potatoPreview").src = "http://127.0.0.1:5000/" + data.image_url;
+    document.getElementById("potatoImgPred").innerHTML = data.image_prediction.prediction;
+    document.getElementById("potatoImgConf").innerHTML = data.image_prediction.confidence.toFixed(2);
+    document.getElementById("potatoWeatherPred").innerHTML = data.weather_prediction ? data.weather_prediction.prediction : "Not Provided";
+    document.getElementById("potatoFinal").innerHTML = data.final_prediction;
+}
+// ----------------- RICE -----------------
+async function predictRice() {
+    const file = document.getElementById("riceImage").files[0];
+    const lat = document.getElementById("riceLat").value;
+    const lon = document.getElementById("riceLon").value;
+
+    if (!file) {
+        alert("Please upload a rice image!");
+        return;
+    }
+
+    let fd = new FormData();
+    fd.append("file", file);
+    fd.append("lat", lat);
+    fd.append("lon", lon);
+
+    const res = await fetch("http://127.0.0.1:5000/predict/goal3/rice", {
+        method: "POST",
+        body: fd
+    });
+
+    const data = await res.json();
+
+    document.getElementById("riceResult").style.display = "block";
+    document.getElementById("ricePreview").src = "http://127.0.0.1:5000/" + data.image_url;
+    document.getElementById("riceImgPred").innerHTML = data.image_prediction.prediction;
+    document.getElementById("riceImgConf").innerHTML = data.image_prediction.confidence.toFixed(2);
+
+    document.getElementById("riceWeatherPred").innerHTML =
+        data.weather_prediction ? data.weather_prediction.prediction : "Not Provided";
+
+    document.getElementById("riceFinal").innerHTML = data.final_prediction;
+}
+
+
+// ----------------- WHEAT -----------------
+async function predictWheat() {
+    const file = document.getElementById("wheatImage").files[0];
+    const lat = document.getElementById("wheatLat").value;
+    const lon = document.getElementById("wheatLon").value;
+
+    if (!file) {
+        alert("Please upload a wheat image!");
+        return;
+    }
+
+    let fd = new FormData();
+    fd.append("file", file);
+    fd.append("lat", lat);
+    fd.append("lon", lon);
+
+    const res = await fetch("http://127.0.0.1:5000/predict/goal3/wheat", {
+        method: "POST",
+        body: fd
+    });
+
+    const data = await res.json();
+
+    document.getElementById("wheatResult").style.display = "block";
+    document.getElementById("wheatPreview").src = "http://127.0.0.1:5000/" + data.image_url;
+    document.getElementById("wheatImgPred").innerHTML = data.image_prediction.prediction;
+    document.getElementById("wheatImgConf").innerHTML = data.image_prediction.confidence.toFixed(2);
+
+    document.getElementById("wheatWeatherPred").innerHTML =
+        data.weather_prediction ? data.weather_prediction.prediction : "Not Provided";
+
+    document.getElementById("wheatFinal").innerHTML = data.final_prediction;
+}
+
+// ----------------- GOAL 2 -----------------
+async function predictGoal2() {
+    const lat = goal2Lat.value;
+    const lon = goal2Lon.value;
+
+    const res = await fetch("/predict/goal2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lon })
+    });
+
+    const data = await res.json();
+    goal2Output.textContent = JSON.stringify(data, null, 2);
+}
+
+</script>
+
+</body>
+</html>
