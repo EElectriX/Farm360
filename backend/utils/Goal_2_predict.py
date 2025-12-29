@@ -15,7 +15,10 @@ from flask_cors import CORS
 GEOJSON_PATH = "Models/Goal_2/wosis_latest.geojson"
 SCALER_PATH = "Models/Goal_2/disease_scaler.pkl"
 MODEL_PATH = "Models/Goal_2/xgboost_disease_model.pkl"
-OPENWEATHER_API_KEY = os.environ.get('OPENWEATHER_API_KEY', '00967c003d1aa577334ce7612061524b')
+OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+
+if not OPENWEATHER_API_KEY:
+    raise RuntimeError("OPENWEATHER_API_KEY not set")
 
 
 
